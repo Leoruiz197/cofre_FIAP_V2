@@ -38,14 +38,18 @@ void setSmoke(bool state) {
 }
 
 void setLED1(int r, int g, int b) {
-    led1.setPixelColor(0, led1.Color(r, g, b));
+    for(int i = 0; i < LED_COUNT; i++) {
+        led1.setPixelColor(i, led1.Color(r, g, b));
+    }
     led1.show();
 
     Serial.println("[HW] LED1 atualizado");
 }
 
 void setLED2(int r, int g, int b) {
-    led2.setPixelColor(0, led2.Color(r, g, b));
+    for(int i = 0; i < LED_COUNT; i++) {
+        led2.setPixelColor(i, led2.Color(r, g, b));
+    }
     led2.show();
 
     Serial.println("[HW] LED2 atualizado");

@@ -9,6 +9,8 @@
 #define DF_RX 17
 #define DF_TX 16
 
+#define MPU_ADDR 0x68
+
 #define LED_COUNT 18
 
 #define STATUS_INTERVAL 5000
