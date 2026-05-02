@@ -1,22 +1,24 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
-
 #include "status_task.h"
-#include "websocket_task.h"
-#include "system_state.h"
+#include "../websocket.h"
+#include "../system_state.h"
 
-
-// ================= TASK =================
 void statusTask(void *pvParameters) {
 
-    Serial.println("[STATUS] Iniciando...");
-
     while (true) {
+
+        // 🔥 NÃO ENVIA SE NÃO ESTIVER CONECTADO
+        if (!wsConnected) {
+            Serial.println("[STATUS] WS não conectado, aguardando...");
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            continue;
+        }
 
         JsonDocument doc;
 
         doc["type"] = "status";
-        doc["device"] = "cofre1";
+        doc["device"] = device_id;
         doc["state"] = "online";
 
         doc["servo"] = servoAngle;
@@ -31,7 +33,8 @@ void statusTask(void *pvParameters) {
 
         wsSend(msg);
 
-        Serial.println("[STATUS] enviado");
+        Serial.println("[STATUS] enviado:");
+        Serial.println(msg);
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }

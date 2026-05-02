@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <WiFi.h>
 #include "websocket_task.h"
-#include "../websocket.h"   // 🔥 IMPORTANTE
-
-const char* WS_HOST = "websocket-cofre.onrender.com";
-const int WS_PORT = 443;
+#include "../websocket.h"
+#include "../system_state.h"
+#include "../hardware.h"
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -12,26 +12,125 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
         case WStype_CONNECTED:
             Serial.println("[WS] Conectado");
+            wsConnected = true;
+
+            // 🔥 envia identificação do device
+            {
+                JsonDocument doc;
+                doc["device"] = device_id;
+
+                String msg;
+                serializeJson(doc, msg);
+
+                webSocket.sendTXT(msg);
+            }
+
             break;
 
         case WStype_DISCONNECTED:
             Serial.println("[WS] Desconectado");
+            wsConnected = false;
             break;
 
         case WStype_TEXT:
-            Serial.println("[WS] Mensagem recebida");
+            Serial.println("[WS] Mensagem recebida:");
+            String msg = String((char*)payload);
+            Serial.println(msg);
+
+            JsonDocument doc;
+            deserializeJson(doc, msg);
+
+            String type = doc["type"];
+
+            if (type == "batch") {
+
+                JsonArray commands = doc["commands"];
+
+                for (JsonObject cmd : commands) {
+
+                    String command = cmd["command"];
+
+
+
+                    // ================= SERVO =================
+                    if (command == "LOCK") {
+
+                        int angle = cmd["value"].as<int>();
+
+                        Serial.println("[CMD] Servo:");
+                        Serial.println(angle);
+
+                        setServo(angle);
+                    }
+
+                    // ================= LED =================
+                    if (command == "LED") {
+
+                        String target = cmd["target"] | "";
+
+                        int r = cmd["r"] | 0;
+                        int g = cmd["g"] | 0;
+                        int b = cmd["b"] | 0;
+
+                        Serial.println("[CMD] LED:");
+                        Serial.print("Target: "); Serial.println(target);
+                        Serial.print("RGB: ");
+                        Serial.print(r); Serial.print(", ");
+                        Serial.print(g); Serial.print(", ");
+                        Serial.println(b);
+
+                        if (target == "STRIP1") {
+                            setLED1(r, g, b); // 🔥 chama hardware
+                        }
+                        if (target == "STRIP2") {
+                            setLED2(r, g, b); // 🔥 chama hardware
+                        }
+                    }
+                }
+            }
             break;
     }
 }
 
 void websocketTask(void *pvParameters) {
 
-    webSocket.beginSSL(WS_HOST, WS_PORT, "/");
-    webSocket.onEvent(webSocketEvent);
-    webSocket.setReconnectInterval(5000);
+    Serial.println("[WS] Iniciando...");
 
     while (true) {
-        webSocket.loop();
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+
+        // ================= GARANTE WIFI =================
+        if (!wifiReady) {
+            Serial.println("[WS] Aguardando WiFi...");
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            continue;
+        }
+
+        // ================= TESTA DNS =================
+        IPAddress ip;
+
+        if (!WiFi.hostByName(ws_host, ip)) {
+            Serial.println("[WS] DNS falhou, tentando novamente...");
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            continue;
+        }
+
+        Serial.println("[WS] DNS OK, conectando...");
+
+        // ================= CONECTA =================
+        webSocket.beginSSL(ws_host, atoi(ws_port), "/");
+        webSocket.onEvent(webSocketEvent);
+        webSocket.setReconnectInterval(5000);
+
+        // ================= LOOP =================
+        while (WiFi.status() == WL_CONNECTED) {
+            webSocket.loop();
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+        }
+
+        // se caiu WiFi, volta pro início
+        Serial.println("[WS] WiFi caiu, reiniciando conexão...");
+        wsConnected = false;
+
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }

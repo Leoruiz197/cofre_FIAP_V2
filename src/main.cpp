@@ -1,11 +1,12 @@
 #include <Arduino.h>
-
+#include "hardware.h"
 #include "tasks/wifi_task.h"
 #include "tasks/websocket_task.h"
 #include "tasks/status_task.h"
 
 void setup() {
     Serial.begin(115200);
+    hardwareInit();
 
     // WIFI
     xTaskCreatePinnedToCore(
