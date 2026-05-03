@@ -87,7 +87,13 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                             setLED2(r, g, b); // 🔥 chama hardware
                         }
                     }
-                    
+
+                    if (command == "LEDS_OFF") {
+                        Serial.println("[CMD] LEDS_OFF");
+
+                        setLED1(0, 0, 0);
+                        //setLED2(0, 0, 0);
+                    }
                     // ================= SMOKE =================
                     if (command == "SMOKE") {
 

@@ -10,6 +10,14 @@ Servo servo;
 Adafruit_NeoPixel led1(LED_COUNT, LED1_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel led2(LED_COUNT, LED2_PIN, NEO_GRB + NEO_KHZ800);
 
+int strip1R = 0;
+int strip1G = 0;
+int strip1B = 0;
+
+int strip2R = 0;
+int strip2G = 0;
+int strip2B = 0;
+
 void hardwareInit() {
     pinMode(SMOKE_PIN, OUTPUT);
     digitalWrite(SMOKE_PIN, HIGH);
@@ -40,6 +48,10 @@ void setSmoke(bool state) {
 }
 
 void setLED1(int r, int g, int b) {
+    strip1R = r;
+    strip1G = g;
+    strip1B = b;
+
     for(int i = 0; i < LED_COUNT; i++) {
         led1.setPixelColor(i, led1.Color(r, g, b));
     }
@@ -49,6 +61,10 @@ void setLED1(int r, int g, int b) {
 }
 
 void setLED2(int r, int g, int b) {
+    strip2R = r;
+    strip2G = g;
+    strip2B = b;
+
     for(int i = 0; i < LED_COUNT; i++) {
         led2.setPixelColor(i, led2.Color(r, g, b));
     }

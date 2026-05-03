@@ -5,11 +5,14 @@
 #include "../config.h"
 #include "../dfplayer.h"
 
+float threshold = 1.1;
 
-float threshold = 1.1; // 🔥 sensibilidade (ajuste fino)
+// Guarda a cor anterior do LED 1
+extern int strip1R;
+extern int strip1G;
+extern int strip1B;
 
 void readMPU(float &ax, float &ay, float &az) {
-
     Wire.beginTransmission(MPU_ADDR);
     Wire.write(0x3B);
     Wire.endTransmission(false);
@@ -17,7 +20,6 @@ void readMPU(float &ax, float &ay, float &az) {
     Wire.requestFrom((uint8_t)MPU_ADDR, (uint8_t)6, (bool)true);
 
     if (Wire.available() >= 6) {
-
         int16_t rawX = Wire.read() << 8 | Wire.read();
         int16_t rawY = Wire.read() << 8 | Wire.read();
         int16_t rawZ = Wire.read() << 8 | Wire.read();
@@ -25,14 +27,13 @@ void readMPU(float &ax, float &ay, float &az) {
         ax = rawX / 16384.0;
         ay = rawY / 16384.0;
         az = rawZ / 16384.0;
-
     } else {
         Serial.println("[MPU] Erro leitura I2C");
     }
 }
 
 void mpuInit() {
-    Wire.begin(21,22);
+    Wire.begin(21, 22);
 
     Wire.beginTransmission(MPU_ADDR);
     Wire.write(0x6B);
@@ -42,34 +43,39 @@ void mpuInit() {
     Serial.println("[MPU] Inicializado");
 }
 
-void mpuTask(void *pvParameters) {
+void impactFeedback() {
+    int oldR = strip1R;
+    int oldG = strip1G;
+    int oldB = strip1B;
 
+    setLED1(255, 0, 0);
+    playSound(1);
+
+    delay(500);
+
+    setLED1(oldR, oldG, oldB);
+}
+
+void mpuTask(void *pvParameters) {
     mpuInit();
 
     unsigned long lastTrigger = 0;
 
     while (true) {
+        float ax = 0;
+        float ay = 0;
+        float az = 0;
 
-        float ax, ay, az;
         readMPU(ax, ay, az);
 
         float impact = sqrt(ax * ax + ay * ay + az * az);
 
-        // Serial.print("[MPU] Impacto: ");
-        // Serial.println(impact);
-
-        // 🔥 DETECÇÃO DE PANCADA
-        if (impact > threshold && millis() - lastTrigger > 2000)  {
+        if (impact > threshold && millis() - lastTrigger > 2000) {
+            lastTrigger = millis();
 
             Serial.println("[MPU] IMPACTO DETECTADO!");
 
-            // 🔥 AÇÃO (exemplo)
-            setLED1(255, 0, 0);   // vermelho
-            playSound(1);        // toca som de alarme
-
-            delay(500);
-
-            setLED1(0, 0, 0);
+            impactFeedback();
         }
 
         vTaskDelay(200 / portTICK_PERIOD_MS);
