@@ -5,25 +5,33 @@
 #include "../config.h"
 
 
-float threshold = 1.5; // 🔥 sensibilidade (ajuste fino)
+float threshold = 1.1; // 🔥 sensibilidade (ajuste fino)
 
 void readMPU(float &ax, float &ay, float &az) {
+
     Wire.beginTransmission(MPU_ADDR);
     Wire.write(0x3B);
     Wire.endTransmission(false);
+
     Wire.requestFrom((uint8_t)MPU_ADDR, (uint8_t)6, (bool)true);
 
-    int16_t rawX = Wire.read() << 8 | Wire.read();
-    int16_t rawY = Wire.read() << 8 | Wire.read();
-    int16_t rawZ = Wire.read() << 8 | Wire.read();
+    if (Wire.available() >= 6) {
 
-    ax = rawX / 16384.0;
-    ay = rawY / 16384.0;
-    az = rawZ / 16384.0;
+        int16_t rawX = Wire.read() << 8 | Wire.read();
+        int16_t rawY = Wire.read() << 8 | Wire.read();
+        int16_t rawZ = Wire.read() << 8 | Wire.read();
+
+        ax = rawX / 16384.0;
+        ay = rawY / 16384.0;
+        az = rawZ / 16384.0;
+
+    } else {
+        Serial.println("[MPU] Erro leitura I2C");
+    }
 }
 
 void mpuInit() {
-    Wire.begin(22,21);
+    Wire.begin(21,22);
 
     Wire.beginTransmission(MPU_ADDR);
     Wire.write(0x6B);
