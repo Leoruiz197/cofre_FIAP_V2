@@ -96,8 +96,16 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                     }
                     // ================= SMOKE =================
                     if (command == "SMOKE") {
+                        bool state = false;
 
-                        bool state = cmd["value"] | false;
+                        if (cmd["value"].is<bool>()) {
+                            state = cmd["value"].as<bool>();
+                        } else if (cmd["value"].is<int>()) {
+                            state = cmd["value"].as<int>() == 1;
+                        } else if (cmd["value"].is<const char*>()) {
+                            String value = cmd["value"].as<const char*>();
+                            state = value == "1" || value == "true" || value == "ON";
+                        }
 
                         Serial.println("[CMD] SMOKE:");
                         Serial.println(state);

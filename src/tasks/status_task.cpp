@@ -5,12 +5,11 @@
 #include "../system_state.h"
 
 String lastStatusJson = "INIT";
+int statusSemAlteracaoCount = 0;
 
 void statusTask(void *pvParameters) {
-
     while (true) {
 
-        // 🔥 NÃO ENVIA SE NÃO ESTIVER CONECTADO
         if (!wsConnected) {
             Serial.println("[STATUS] WS não conectado, aguardando...");
             vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -34,16 +33,28 @@ void statusTask(void *pvParameters) {
         serializeJson(doc, msg);
 
         if (msg != lastStatusJson) {
-
             wsSend(msg);
 
             Serial.println("[STATUS] enviado:");
             Serial.println(msg);
 
             lastStatusJson = msg;
+            statusSemAlteracaoCount = 0;
         } else {
-            Serial.println("[STATUS] sem alteração");
-}
+            statusSemAlteracaoCount++;
+
+            Serial.print("[STATUS] sem alteração: ");
+            Serial.println(statusSemAlteracaoCount);
+
+            if (statusSemAlteracaoCount >= 3) {
+                wsSend(msg);
+
+                Serial.println("[STATUS] heartbeat online enviado:");
+                Serial.println(msg);
+
+                statusSemAlteracaoCount = 0;
+            }
+        }
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
