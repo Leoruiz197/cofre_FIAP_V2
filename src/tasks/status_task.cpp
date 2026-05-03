@@ -4,6 +4,8 @@
 #include "../websocket.h"
 #include "../system_state.h"
 
+String lastStatusJson = "INIT";
+
 void statusTask(void *pvParameters) {
 
     while (true) {
@@ -31,10 +33,17 @@ void statusTask(void *pvParameters) {
         String msg;
         serializeJson(doc, msg);
 
-        wsSend(msg);
+        if (msg != lastStatusJson) {
 
-        Serial.println("[STATUS] enviado:");
-        Serial.println(msg);
+            wsSend(msg);
+
+            Serial.println("[STATUS] enviado:");
+            Serial.println(msg);
+
+            lastStatusJson = msg;
+        } else {
+            Serial.println("[STATUS] sem alteração");
+}
 
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }

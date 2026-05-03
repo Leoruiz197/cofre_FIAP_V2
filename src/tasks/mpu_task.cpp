@@ -3,6 +3,7 @@
 #include "mpu_task.h"
 #include "../hardware.h"
 #include "../config.h"
+#include "../dfplayer.h"
 
 
 float threshold = 1.1; // 🔥 sensibilidade (ajuste fino)
@@ -54,8 +55,8 @@ void mpuTask(void *pvParameters) {
 
         float impact = sqrt(ax * ax + ay * ay + az * az);
 
-        Serial.print("[MPU] Impacto: ");
-        Serial.println(impact);
+        // Serial.print("[MPU] Impacto: ");
+        // Serial.println(impact);
 
         // 🔥 DETECÇÃO DE PANCADA
         if (impact > threshold && millis() - lastTrigger > 2000)  {
@@ -64,6 +65,7 @@ void mpuTask(void *pvParameters) {
 
             // 🔥 AÇÃO (exemplo)
             setLED1(255, 0, 0);   // vermelho
+            playSound(1);        // toca som de alarme
 
             delay(500);
 

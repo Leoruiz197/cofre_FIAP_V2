@@ -3,12 +3,12 @@
 #include <ESP32Servo.h>
 #include "system_state.h"
 #include "hardware.h"
+#include "dfplayer.h"
 
 Servo servo;
 
 Adafruit_NeoPixel led1(LED_COUNT, LED1_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel led2(LED_COUNT, LED2_PIN, NEO_GRB + NEO_KHZ800);
-
 
 void hardwareInit() {
     pinMode(SMOKE_PIN, OUTPUT);
@@ -25,6 +25,8 @@ void hardwareInit() {
     led2.begin();
     led2.clear();
     led2.show();
+
+    initDFPlayer();
 }
 
 void setServo(int angle) {

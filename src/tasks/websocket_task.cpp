@@ -5,6 +5,7 @@
 #include "../websocket.h"
 #include "../system_state.h"
 #include "../hardware.h"
+#include "../dfplayer.h"
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -84,6 +85,45 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         }
                         if (target == "STRIP2") {
                             setLED2(r, g, b); // 🔥 chama hardware
+                        }
+                    }
+                    
+                    // ================= SMOKE =================
+                    if (command == "SMOKE") {
+
+                        bool state = cmd["value"] | false;
+
+                        Serial.println("[CMD] SMOKE:");
+                        Serial.println(state);
+
+                        setSmoke(state);
+                    }
+
+                    // ================= SOUND =================
+                    if (command == "SOUND") {
+
+                        String action = cmd["action"] | "";
+
+                        if (action == "PLAY") {
+                            int track = cmd["track"] | 1;
+                            playSound(track);
+                        }
+
+                        else if (action == "STOP") {
+                            stopSound();
+                        }
+
+                        else if (action == "SET_VOLUME") {
+                            int volume = cmd["value"] | 20;
+                            setVolume(volume);
+                        }
+
+                        else if (action == "UP") {
+                            volumeUp();
+                        }
+
+                        else if (action == "DOWN") {
+                            volumeDown();
                         }
                     }
                 }

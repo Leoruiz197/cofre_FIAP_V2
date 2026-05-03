@@ -1,32 +1,93 @@
 #include "config.h"
 #include <DFRobotDFPlayerMini.h>
+#include <HardwareSerial.h>
 #include "system_state.h"
 
 HardwareSerial dfSerial(2);
-DFRobotDFPlayerMini player;
+DFRobotDFPlayerMini dfPlayer;
 
 bool df_ok = false;
 
-void dfInit() {
+// ================= INIT =================
+void initDFPlayer() {
+
     dfSerial.begin(9600, SERIAL_8N1, DF_RX, DF_TX);
 
-    if (player.begin(dfSerial)) {
+    if (dfPlayer.begin(dfSerial)) {
+
         df_ok = true;
-        player.volume(25);
+
+        dfPlayer.volume(25);
+
+        Serial.println("[DF] DFPlayer OK");
+
+    } else {
+
+        df_ok = false;
+
+        Serial.println("[DF] Erro DFPlayer!");
     }
 }
 
-void playTrack(int track) {
-    if (!df_ok) return;
+// ================= PLAY =================
+void playSound(int track) {
+
+    if (!df_ok) {
+        Serial.println("[DF] Não inicializado");
+        return;
+    }
 
     currentTrack = track;
-    player.play(track);
     soundPlaying = true;
+
+    dfPlayer.play(track);
+
+    Serial.println("[DF] Tocando faixa");
 }
 
-void stopTrack() {
+// ================= STOP =================
+void stopSound() {
+
     if (!df_ok) return;
 
-    player.stop();
+    dfPlayer.stop();
+
     soundPlaying = false;
+
+    Serial.println("[DF] Parado");
+}
+
+// ================= VOLUME =================
+void setVolume(int volume) {
+
+    if (!df_ok) return;
+
+    // 🔥 DFPlayer aceita 0 - 30
+    if (volume < 0) volume = 0;
+    if (volume > 30) volume = 30;
+
+    dfPlayer.volume(volume);
+
+    Serial.print("[DF] Volume setado: ");
+    Serial.println(volume);
+}
+
+// ================= AUMENTAR =================
+void volumeUp() {
+
+    if (!df_ok) return;
+
+    dfPlayer.volumeUp();
+
+    Serial.println("[DF] Volume aumentado");
+}
+
+// ================= DIMINUIR =================
+void volumeDown() {
+
+    if (!df_ok) return;
+
+    dfPlayer.volumeDown();
+
+    Serial.println("[DF] Volume diminuído");
 }
