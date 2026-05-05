@@ -10,8 +10,8 @@ Preferences hardwarepreferences;
 
 Servo servo;
 
-Adafruit_NeoPixel led1(LED_COUNT, LED1_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel led2(LED_COUNT, LED2_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel led1(LED1_COUNT, LED1_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel led2(LED2_COUNT, LED2_PIN, NEO_GRB + NEO_KHZ800);
 
 void loadServoAngles() {
     hardwarepreferences.begin("cofre", true);
@@ -105,7 +105,7 @@ void setLED1(int r, int g, int b) {
     strip1G = g;
     strip1B = b;
 
-    for(int i = 0; i < LED_COUNT; i++) {
+    for(int i = 0; i < LED1_COUNT; i++) {
         led1.setPixelColor(i, led1.Color(r, g, b));
     }
     led1.show();
