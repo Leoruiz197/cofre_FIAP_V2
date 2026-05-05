@@ -115,8 +115,10 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
                     // ================= SOUND =================
                     if (command == "SOUND") {
-
                         String action = cmd["action"] | "";
+
+                        Serial.println("[CMD] SOUND:");
+                        Serial.println(action);
 
                         if (action == "PLAY") {
                             int track = cmd["track"] | 1;
@@ -129,6 +131,10 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
                         else if (action == "SET_VOLUME") {
                             int volume = cmd["value"] | 20;
+
+                            Serial.print("[CMD] Volume recebido: ");
+                            Serial.println(volume);
+
                             setVolume(volume);
                         }
 

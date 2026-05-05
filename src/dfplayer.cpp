@@ -64,7 +64,7 @@ void setVolume(int volume) {
 
     // 🔥 DFPlayer aceita 0 - 30
     if (volume < 0) volume = 0;
-    if (volume > 30) volume = 30;
+    if (volume > 50) volume = 50;
 
     dfPlayer.volume(volume);
 
