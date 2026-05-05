@@ -4,6 +4,8 @@ bool wifiReady = false;
 bool wsConnected = false;
 
 int servoAngle = 0;
+bool doorOpen = false;
+bool internalLightOn = false;
 bool smokeActive = false;
 
 bool soundPlaying = false;

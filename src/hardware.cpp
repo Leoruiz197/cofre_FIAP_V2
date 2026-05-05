@@ -6,7 +6,7 @@
 #include "dfplayer.h"
 #include <Preferences.h>
 
-Preferences preferences;
+Preferences hardwarepreferences;
 
 Servo servo;
 
@@ -22,12 +22,12 @@ int strip2G = 0;
 int strip2B = 0;
 
 void loadServoAngles() {
-    preferences.begin("cofre", true);
+    hardwarepreferences.begin("cofre", true);
 
-    doorOpenAngle = preferences.getInt("openAngle", 30);
-    doorCloseAngle = preferences.getInt("closeAngle", 160);
+    doorOpenAngle = hardwarepreferences.getInt("openAngle", 30);
+    doorCloseAngle = hardwarepreferences.getInt("closeAngle", 160);
 
-    preferences.end();
+    hardwarepreferences.end();
 
     Serial.println("[EEPROM] Angulos carregados:");
     Serial.print("Open: ");
@@ -40,12 +40,12 @@ void saveServoAngles(int openAngle, int closeAngle) {
     doorOpenAngle = constrain(openAngle, 0, 180);
     doorCloseAngle = constrain(closeAngle, 0, 180);
 
-    preferences.begin("cofre", false);
+    hardwarepreferences.begin("cofre", false);
 
-    preferences.putInt("openAngle", doorOpenAngle);
-    preferences.putInt("closeAngle", doorCloseAngle);
+    hardwarepreferences.putInt("openAngle", doorOpenAngle);
+    hardwarepreferences.putInt("closeAngle", doorCloseAngle);
 
-    preferences.end();
+    hardwarepreferences.end();
 
     Serial.println("[EEPROM] Angulos salvos:");
     Serial.print("Open: ");
@@ -84,6 +84,7 @@ void setServo(int angle) {
 
 void setDoorOpen() {
     servo.write(doorOpenAngle);
+    doorOpen = true;
 
     Serial.print("[SERVO] Abrindo porta: ");
     Serial.println(doorOpenAngle);
@@ -91,6 +92,7 @@ void setDoorOpen() {
 
 void setDoorClose() {
     servo.write(doorCloseAngle);
+    doorOpen = false;
 
     Serial.print("[SERVO] Fechando porta: ");
     Serial.println(doorCloseAngle);
@@ -128,16 +130,17 @@ void setLED2(int r, int g, int b) {
 }
 
 void luzInterno(bool on) {
+    internalLightOn = on;
 
     for (int i = LED2_COUNT; i < LED2_COUNT + LED_INT_COUNT; i++) {
-        if (on) {
-            led2.setPixelColor(i, led2.Color(255, 255, 255));
-        } else {
-            led2.setPixelColor(i, led2.Color(0, 0, 0));
-        }
+        led2.setPixelColor(
+            i,
+            on ? led2.Color(255, 255, 255) : led2.Color(0, 0, 0)
+        );
     }
+
     led2.show();
-    
+
     Serial.println("[HW] LED Interno atualizado");
 }
 

@@ -17,3 +17,5 @@ extern char device_id[20];
 
 extern int doorOpenAngle;
 extern int doorCloseAngle;
+extern bool doorOpen;
+extern bool internalLightOn;

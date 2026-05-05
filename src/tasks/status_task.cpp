@@ -23,6 +23,10 @@ void statusTask(void *pvParameters) {
         doc["state"] = "online";
 
         doc["servo"] = servoAngle;
+        doc["doorOpen"] = doorOpen;
+        doc["internalLight"] = internalLightOn;
+        doc["openAngle"] = doorOpenAngle;
+        doc["closeAngle"] = doorCloseAngle;
         doc["smoke"] = smokeActive;
 
         JsonObject sound = doc["sound"].to<JsonObject>();

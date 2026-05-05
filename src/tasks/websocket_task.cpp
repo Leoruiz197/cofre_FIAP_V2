@@ -189,6 +189,21 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                             volumeDown();
                         }
                     }
+
+                    // ================= WIN EFFECT =================
+                    if (command == "WIN_EFFECT") {
+
+                        Serial.println("[CMD] WIN_EFFECT");
+                        setLED1(0, 255, 0); 
+                        playSound(random(4, 8)); // som 4 a 7
+
+                        setSmoke(true);
+                        delay(2000);
+
+                        luzInterno(true);
+                        delay(500);
+                        setDoorOpen();
+                    }
                 }
             }
             break;
