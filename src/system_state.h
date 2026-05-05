@@ -1,4 +1,11 @@
 #pragma once
+extern int strip1R;
+extern int strip1G;
+extern int strip1B;
+
+extern int strip2R;
+extern int strip2G;
+extern int strip2B;
 
 extern bool wifiReady;
 extern bool wsConnected;

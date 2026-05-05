@@ -99,7 +99,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         Serial.print("Close: ");
                         Serial.println(doorCloseAngle);
                     }
-                    
+
                     // ================= LED =================
                     if (command == "LED") {
 
@@ -216,6 +216,21 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         luzInterno(true);
                         delay(500);
                         setDoorOpen();
+                    }
+
+                    // ================= ERROR EFFECT =================
+                    if (command == "ERROR_EFFECT") {
+
+                        Serial.println("[CMD] ERROR_EFFECT");
+
+                        playSound(10);
+                        int prevR = strip1R;
+                        int prevG = strip1G;
+                        int prevB = strip1B;
+
+                        setLED1(255, 0, 0); // vermelho
+                        delay(300);
+                        setLED1(prevR, prevG, prevB);   // volta
                     }
 
                     // ================= RESET EFFECT =================

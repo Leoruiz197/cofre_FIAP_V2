@@ -19,3 +19,11 @@ char device_id[20] = "cofre";
 
 int doorOpenAngle = 30;   // padrão aberto
 int doorCloseAngle = 160; // padrão fechado
+
+int strip1R = 0;
+int strip1G = 0;
+int strip1B = 0;
+
+int strip2R = 0;
+int strip2G = 0;
+int strip2B = 0;

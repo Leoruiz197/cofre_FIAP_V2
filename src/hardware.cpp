@@ -13,14 +13,6 @@ Servo servo;
 Adafruit_NeoPixel led1(LED_COUNT, LED1_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel led2(LED_COUNT, LED2_PIN, NEO_GRB + NEO_KHZ800);
 
-int strip1R = 0;
-int strip1G = 0;
-int strip1B = 0;
-
-int strip2R = 0;
-int strip2G = 0;
-int strip2B = 0;
-
 void loadServoAngles() {
     hardwarepreferences.begin("cofre", true);
 
