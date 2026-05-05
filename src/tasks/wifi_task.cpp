@@ -3,6 +3,7 @@
 #include "wifi_task.h"
 #include "../system_state.h"
 #include <Preferences.h>
+#include "./dfplayer.h"
 
 Preferences preferences;
 
@@ -70,6 +71,7 @@ void wifiTask(void *pvParameters) {
     }
 
     // ================= AUTO CONNECT =================
+    playSound(3);
     if (!wm.autoConnect("Cofre-Setup")) {
         Serial.println("[WiFi] Falha, reiniciando...");
         ESP.restart();
