@@ -87,6 +87,19 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         }
                     }
 
+                    if (command == "SET_SERVO") {
+                        int open = cmd["open"] | doorOpenAngle;
+                        int close = cmd["close"] | doorCloseAngle;
+
+                        saveServoAngles(open, close);
+
+                        Serial.println("[CMD] SET_SERVO:");
+                        Serial.print("Open: ");
+                        Serial.println(doorOpenAngle);
+                        Serial.print("Close: ");
+                        Serial.println(doorCloseAngle);
+                    }
+                    
                     // ================= LED =================
                     if (command == "LED") {
 
@@ -203,6 +216,22 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         luzInterno(true);
                         delay(500);
                         setDoorOpen();
+                    }
+
+                    // ================= RESET EFFECT =================
+                    if (command == "RESET_EFFECT") {
+                        Serial.println("[CMD] RESET_EFFECT");
+                        setLED1(0, 0, 0); 
+                        setSmoke(false);
+                        luzInterno(false);
+                        setDoorClose();
+
+                        for (int i = 0; i < 3; i++) {
+                            setLED1(255, 0, 0);
+                            delay(150);
+                            setLED1(0, 0, 0);
+                            delay(150);
+                        }
                     }
                 }
             }

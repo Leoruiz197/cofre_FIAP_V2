@@ -77,6 +77,7 @@ void setServo(int angle) {
     angle = constrain(angle, 0, 180);
 
     servo.write(angle);
+    servoAngle = angle;
 
     Serial.print("[SERVO] Angulo direto: ");
     Serial.println(angle);
@@ -86,6 +87,8 @@ void setDoorOpen() {
     servo.write(doorOpenAngle);
     doorOpen = true;
 
+    servoAngle = doorOpenAngle;
+
     Serial.print("[SERVO] Abrindo porta: ");
     Serial.println(doorOpenAngle);
 }
@@ -94,6 +97,8 @@ void setDoorClose() {
     servo.write(doorCloseAngle);
     doorOpen = false;
 
+    servoAngle = doorOpenAngle;
+    
     Serial.print("[SERVO] Fechando porta: ");
     Serial.println(doorCloseAngle);
 }
