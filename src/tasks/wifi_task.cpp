@@ -9,6 +9,10 @@ Preferences preferences;
 
 #define RESET_BUTTON_PIN 0
 
+const char* DEFAULT_SSID = "NOME_DA_REDE";
+const char* DEFAULT_PASS = "SENHA_DA_REDE";
+char device_id[20] = "cofre";
+
 void wifiTask(void *pvParameters) {
 
     Serial.println("[WiFi] Iniciando...");
@@ -27,6 +31,23 @@ void wifiTask(void *pvParameters) {
     if (savedHost.length() > 0) strcpy(ws_host, savedHost.c_str());
     if (savedPort.length() > 0) strcpy(ws_port, savedPort.c_str());
     if (savedDevice.length() > 0) strcpy(device_id, savedDevice.c_str());
+
+    Serial.println("[WiFi] Tentando WiFi padrão...");
+
+    WiFi.begin(DEFAULT_SSID, DEFAULT_PASS);
+
+    unsigned long startAttempt = millis();
+
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttempt < 10000) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("\n[WiFi] Conectado via WiFi padrão!");
+    } else {
+        Serial.println("\n[WiFi] Falhou, abrindo portal...");
+    }
 
     // ================= WIFI MANAGER =================
     WiFiManager wm;
