@@ -97,8 +97,8 @@ void setDoorClose() {
     servo.write(doorCloseAngle);
     doorOpen = false;
 
-    servoAngle = doorOpenAngle;
-    
+    servoAngle = doorCloseAngle;
+
     Serial.print("[SERVO] Fechando porta: ");
     Serial.println(doorCloseAngle);
 }
