@@ -49,9 +49,9 @@ void impactFeedback() {
     int oldB = strip1B;
 
     setLED1(255, 0, 0);
-    playSound(random(1, 5));
+    playSound(8);
 
-    delay(500);
+    delay(2500);
 
     setLED1(oldR, oldG, oldB);
 }

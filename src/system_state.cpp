@@ -14,3 +14,6 @@ bool shouldSaveConfig = false;
 char ws_host[40] = "websocket-cofre.onrender.com";
 char ws_port[6] = "443";
 char device_id[20] = "cofre";
+
+int doorOpenAngle = 30;   // padrão aberto
+int doorCloseAngle = 160; // padrão fechado

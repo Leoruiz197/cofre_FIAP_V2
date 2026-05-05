@@ -14,3 +14,6 @@ extern bool shouldSaveConfig;
 extern char ws_host[40];
 extern char ws_port[6];
 extern char device_id[20];
+
+extern int doorOpenAngle;
+extern int doorCloseAngle;

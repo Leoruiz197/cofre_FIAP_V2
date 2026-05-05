@@ -56,12 +56,35 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                     // ================= SERVO =================
                     if (command == "LOCK") {
 
-                        int angle = cmd["value"].as<int>();
+                        // tenta ler como string OU número
+                        String action = cmd["value"] | "";
 
-                        Serial.println("[CMD] Servo:");
-                        Serial.println(angle);
+                        Serial.println("[CMD] LOCK:");
+                        Serial.println(action);
 
-                        setServo(angle);
+                        // ✔ modo OPEN / CLOSE
+                        if (action == "OPEN") {
+                            setDoorOpen();
+                        }
+                        else if (action == "CLOSE") {
+                            setDoorClose();
+                        }
+
+                        // ✔ modo ANGLE (quando vier número)
+                        else {
+
+                            int angle = cmd["value"] | -1;
+
+                            if (angle >= 0) {
+                                Serial.print("[SERVO] Angulo direto: ");
+                                Serial.println(angle);
+
+                                setServo(angle);
+                            }
+                            else {
+                                Serial.println("[LOCK] Valor inválido");
+                            }
+                        }
                     }
 
                     // ================= LED =================
@@ -94,6 +117,26 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         setLED1(0, 0, 0);
                         //setLED2(0, 0, 0);
                     }
+
+                    // ================= LED Interno =================
+                    if (command == "LED_INTERNAL") {
+                        bool state = false;
+
+                        if (cmd["value"].is<bool>()) {
+                            state = cmd["value"].as<bool>();
+                        } else if (cmd["value"].is<int>()) {
+                            state = cmd["value"].as<int>() == 1;
+                        } else if (cmd["value"].is<const char*>()) {
+                            String value = cmd["value"].as<const char*>();
+                            state = value == "1" || value == "true" || value == "ON";
+                        }
+
+                        Serial.println("[CMD] LED_INTERNAL:");
+                        Serial.println(state);
+
+                        luzInterno(state);
+                    }
+
                     // ================= SMOKE =================
                     if (command == "SMOKE") {
                         bool state = false;

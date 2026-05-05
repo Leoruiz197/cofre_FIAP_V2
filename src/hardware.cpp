@@ -4,6 +4,9 @@
 #include "system_state.h"
 #include "hardware.h"
 #include "dfplayer.h"
+#include <Preferences.h>
+
+Preferences preferences;
 
 Servo servo;
 
@@ -17,6 +20,39 @@ int strip1B = 0;
 int strip2R = 0;
 int strip2G = 0;
 int strip2B = 0;
+
+void loadServoAngles() {
+    preferences.begin("cofre", true);
+
+    doorOpenAngle = preferences.getInt("openAngle", 30);
+    doorCloseAngle = preferences.getInt("closeAngle", 160);
+
+    preferences.end();
+
+    Serial.println("[EEPROM] Angulos carregados:");
+    Serial.print("Open: ");
+    Serial.println(doorOpenAngle);
+    Serial.print("Close: ");
+    Serial.println(doorCloseAngle);
+}
+
+void saveServoAngles(int openAngle, int closeAngle) {
+    doorOpenAngle = constrain(openAngle, 0, 180);
+    doorCloseAngle = constrain(closeAngle, 0, 180);
+
+    preferences.begin("cofre", false);
+
+    preferences.putInt("openAngle", doorOpenAngle);
+    preferences.putInt("closeAngle", doorCloseAngle);
+
+    preferences.end();
+
+    Serial.println("[EEPROM] Angulos salvos:");
+    Serial.print("Open: ");
+    Serial.println(doorOpenAngle);
+    Serial.print("Close: ");
+    Serial.println(doorCloseAngle);
+}
 
 void hardwareInit() {
     pinMode(SMOKE_PIN, OUTPUT);
@@ -38,8 +74,26 @@ void hardwareInit() {
 }
 
 void setServo(int angle) {
-    servoAngle = angle;
+    angle = constrain(angle, 0, 180);
+
     servo.write(angle);
+
+    Serial.print("[SERVO] Angulo direto: ");
+    Serial.println(angle);
+}
+
+void setDoorOpen() {
+    servo.write(doorOpenAngle);
+
+    Serial.print("[SERVO] Abrindo porta: ");
+    Serial.println(doorOpenAngle);
+}
+
+void setDoorClose() {
+    servo.write(doorCloseAngle);
+
+    Serial.print("[SERVO] Fechando porta: ");
+    Serial.println(doorCloseAngle);
 }
 
 void setSmoke(bool state) {
@@ -65,10 +119,25 @@ void setLED2(int r, int g, int b) {
     strip2G = g;
     strip2B = b;
 
-    for(int i = 0; i < LED_COUNT; i++) {
+    for(int i = 0; i < LED2_COUNT; i++) {
         led2.setPixelColor(i, led2.Color(r, g, b));
     }
     led2.show();
 
     Serial.println("[HW] LED2 atualizado");
 }
+
+void luzInterno(bool on) {
+
+    for (int i = LED2_COUNT; i < LED2_COUNT + LED_INT_COUNT; i++) {
+        if (on) {
+            led2.setPixelColor(i, led2.Color(255, 255, 255));
+        } else {
+            led2.setPixelColor(i, led2.Color(0, 0, 0));
+        }
+    }
+    led2.show();
+    
+    Serial.println("[HW] LED Interno atualizado");
+}
+

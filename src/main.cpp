@@ -8,7 +8,10 @@
 void setup() {
     Serial.begin(115200);
     randomSeed(esp_random());
+    loadServoAngles();
     hardwareInit();
+    setDoorClose();
+    setLED2(220, 0, 70);
 
     // WIFI
     xTaskCreatePinnedToCore(
