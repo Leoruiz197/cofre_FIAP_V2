@@ -11,13 +11,15 @@ Preferences preferences;
 
 const char* DEFAULT_SSID = "NOME_DA_REDE";
 const char* DEFAULT_PASS = "SENHA_DA_REDE";
-char device_id[20] = "cofre";
+const char* DEFAULT_DEVICE_ID = "cofre_sala1";
+
 
 void wifiTask(void *pvParameters) {
 
     Serial.println("[WiFi] Iniciando...");
 
     pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+    strcpy(device_id, DEFAULT_DEVICE_ID);
 
     // ================= CARREGA CONFIG SALVA =================
     preferences.begin("config", true);
