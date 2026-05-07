@@ -223,7 +223,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
                         Serial.println("[CMD] ERROR_EFFECT");
 
-                        playSound(10);
+                        playSound(2);
                         int prevR = strip1R;
                         int prevG = strip1G;
                         int prevB = strip1B;

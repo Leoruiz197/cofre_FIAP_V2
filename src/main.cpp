@@ -13,16 +13,16 @@ void setup() {
     setDoorClose();
     setLED2(220, 0, 70);
 
-    Serial.println("TESTE SERVO DIRETO");
+    // Serial.println("TESTE SERVO DIRETO");
 
-    setServo(20);
-    delay(2000);
+    // setServo(20);
+    // delay(2000);
 
-    setServo(90);
-    delay(2000);
+    // setServo(90);
+    // delay(2000);
 
-    setServo(150);
-    delay(2000);
+    // setServo(150);
+    // delay(2000);
 
     // WIFI
     xTaskCreatePinnedToCore(
