@@ -5,7 +5,7 @@
 #include "../config.h"
 #include "../dfplayer.h"
 
-float threshold = 1.12;
+float threshold = 1.2;
 
 // Guarda a cor anterior do LED 1
 extern int strip1R;

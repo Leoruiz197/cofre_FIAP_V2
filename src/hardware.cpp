@@ -48,7 +48,7 @@ void saveServoAngles(int openAngle, int closeAngle) {
 
 void hardwareInit() {
     pinMode(SMOKE_PIN, OUTPUT);
-    digitalWrite(SMOKE_PIN, HIGH);
+    setSmoke(true);
 
     Serial.println("[HW] Inicializando servo...");
     servo.setPeriodHertz(50);
@@ -62,6 +62,8 @@ void hardwareInit() {
     led2.clear();
     led2.show();
 
+    setSmoke(false);
+    setLED2(220,0,70);
     initDFPlayer();
 }
 

@@ -214,8 +214,12 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         delay(2000);
 
                         luzInterno(true);
+                        
                         delay(500);
                         setDoorOpen();
+                        
+                        delay(5000);
+                        setSmoke(false);
                     }
 
                     // ================= ERROR EFFECT =================

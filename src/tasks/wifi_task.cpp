@@ -9,9 +9,9 @@ Preferences preferences;
 
 #define RESET_BUTTON_PIN 0
 
-// const char* DEFAULT_SSID = "cf1";
-// const char* DEFAULT_PASS = "12982026";
-// const char* DEFAULT_DEVICE_ID = "cofre1";
+const char* DEFAULT_SSID = "cf";
+const char* DEFAULT_PASS = "12982026"; //12982026
+const char* DEFAULT_DEVICE_ID = "cofre3";
 
 
 void wifiTask(void *pvParameters) {
@@ -34,6 +34,7 @@ void wifiTask(void *pvParameters) {
     if (savedPort.length() > 0) strcpy(ws_port, savedPort.c_str());
     if (savedDevice.length() > 0) strcpy(device_id, savedDevice.c_str());
 
+    strcpy(device_id, DEFAULT_DEVICE_ID);
     Serial.println("[WiFi] Tentando WiFi padrão...");
 
     WiFi.begin(DEFAULT_SSID, DEFAULT_PASS);
