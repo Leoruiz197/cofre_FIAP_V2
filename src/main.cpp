@@ -5,6 +5,8 @@
 #include "tasks/status_task.h"
 #include "tasks/mpu_task.h"
 
+TaskHandle_t mpuTaskHandle = NULL;
+
 void setup() {
     Serial.begin(115200);
     randomSeed(esp_random());
@@ -63,7 +65,7 @@ void setup() {
         4096,
         NULL,
         1,
-        NULL,
+        &mpuTaskHandle,
         1
     );
 }

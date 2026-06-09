@@ -49,6 +49,8 @@ void saveServoAngles(int openAngle, int closeAngle) {
 void hardwareInit() {
     pinMode(SMOKE_PIN, OUTPUT);
     setSmoke(true);
+    delay(1000);
+    setSmoke(false);
 
     Serial.println("[HW] Inicializando servo...");
     servo.setPeriodHertz(50);
@@ -62,7 +64,6 @@ void hardwareInit() {
     led2.clear();
     led2.show();
 
-    setSmoke(false);
     setLED2(220,0,70);
     initDFPlayer();
 }
@@ -99,7 +100,11 @@ void setDoorClose() {
 
 void setSmoke(bool state) {
     smokeActive = state;
+    // LOW = ligado | HIGH = desligado
     digitalWrite(SMOKE_PIN, state ? LOW : HIGH);
+
+    Serial.print("[SMOKE] Estado: ");
+    Serial.println(state ? "ON" : "OFF");
 }
 
 void setLED1(int r, int g, int b) {
@@ -120,7 +125,7 @@ void setLED2(int r, int g, int b) {
     strip2G = g;
     strip2B = b;
 
-    for(int i = 0; i < LED2_COUNT; i++) {
+    for(int i = 0; i < LED2_COUNT-8; i++) {
         led2.setPixelColor(i, led2.Color(r, g, b));
     }
     led2.show();
@@ -131,7 +136,9 @@ void setLED2(int r, int g, int b) {
 void luzInterno(bool on) {
     internalLightOn = on;
 
-    for (int i = LED2_COUNT; i < LED2_COUNT + LED_INT_COUNT; i++) {
+    int start = LED2_COUNT - LED_INT_COUNT;
+
+    for (int i = start; i < LED2_COUNT; i++) {
         led2.setPixelColor(
             i,
             on ? led2.Color(255, 255, 255) : led2.Color(0, 0, 0)

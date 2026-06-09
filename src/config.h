@@ -11,7 +11,7 @@
 
 #define MPU_ADDR 0x68
 
-#define LED1_COUNT 18
+#define LED1_COUNT 24
 #define LED2_COUNT 24
 #define LED_INT_COUNT 8
 

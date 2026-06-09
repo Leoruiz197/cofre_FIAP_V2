@@ -4,24 +4,47 @@
 #include "../system_state.h"
 #include <Preferences.h>
 #include "./dfplayer.h"
+#include <hardware.h>
 
 Preferences preferences;
 
 #define RESET_BUTTON_PIN 0
 
+// ================= CONFIG FLAGS =================
+#define USE_DEFAULT_WIFI 0
+#define USE_DEFAULT_DEVICE_ID 0
+
+// ================= DEFAULT CONFIG =================
+#if USE_DEFAULT_WIFI
 const char* DEFAULT_SSID = "cf";
-const char* DEFAULT_PASS = "12982026"; //12982026
+const char* DEFAULT_PASS = "12982026";
+#endif
+
+#if USE_DEFAULT_DEVICE_ID
 const char* DEFAULT_DEVICE_ID = "cofre3";
+#endif
 
+// ================= CALLBACK AP =================
+void configModeCallback(WiFiManager *myWiFiManager) {
+    Serial.println("[WiFi] Modo AP (portal aberto)");
 
+    stopSound();                 // 🛑 para som
+    setLED1(223, 237, 18);      // 🟡 amarelo
+}
+
+// ================= TASK =================
 void wifiTask(void *pvParameters) {
 
     Serial.println("[WiFi] Iniciando...");
 
     pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
-    strcpy(device_id, DEFAULT_DEVICE_ID);
 
-    // ================= CARREGA CONFIG SALVA =================
+    // ================= DEVICE ID DEFAULT =================
+#if USE_DEFAULT_DEVICE_ID
+    strcpy(device_id, DEFAULT_DEVICE_ID);
+#endif
+
+    // ================= CARREGA CONFIG =================
     preferences.begin("config", true);
 
     String savedHost = preferences.getString("host", "");
@@ -32,9 +55,14 @@ void wifiTask(void *pvParameters) {
 
     if (savedHost.length() > 0) strcpy(ws_host, savedHost.c_str());
     if (savedPort.length() > 0) strcpy(ws_port, savedPort.c_str());
-    if (savedDevice.length() > 0) strcpy(device_id, savedDevice.c_str());
 
-    strcpy(device_id, DEFAULT_DEVICE_ID);
+#if !USE_DEFAULT_DEVICE_ID
+    if (savedDevice.length() > 0) strcpy(device_id, savedDevice.c_str());
+#endif
+
+    // ================= WIFI PADRÃO =================
+#if USE_DEFAULT_WIFI
+
     Serial.println("[WiFi] Tentando WiFi padrão...");
 
     WiFi.begin(DEFAULT_SSID, DEFAULT_PASS);
@@ -52,6 +80,8 @@ void wifiTask(void *pvParameters) {
         Serial.println("\n[WiFi] Falhou, abrindo portal...");
     }
 
+#endif
+
     // ================= WIFI MANAGER =================
     WiFiManager wm;
 
@@ -62,6 +92,8 @@ void wifiTask(void *pvParameters) {
     wm.addParameter(&custom_host);
     wm.addParameter(&custom_port);
     wm.addParameter(&custom_device);
+
+    wm.setAPCallback(configModeCallback);
 
     // ================= RESET MANUAL =================
     unsigned long pressStart = 0;
@@ -76,17 +108,18 @@ void wifiTask(void *pvParameters) {
 
                 Serial.println("[WiFi] Reset + Portal forçado");
 
-                // limpa WiFi
                 wm.resetSettings();
 
-                // 🔥 limpa Preferences
                 preferences.begin("config", false);
                 preferences.clear();
                 preferences.end();
 
                 delay(1000);
 
+                playSound(9);
+
                 wm.startConfigPortal("Cofre-Setup");
+
                 break;
             }
 
@@ -95,13 +128,17 @@ void wifiTask(void *pvParameters) {
     }
 
     // ================= AUTO CONNECT =================
-    playSound(3);
+    playSound(9);
+
     if (!wm.autoConnect("Cofre-Setup")) {
         Serial.println("[WiFi] Falha, reiniciando...");
         ESP.restart();
     }
 
     Serial.println("[WiFi] Conectado!");
+
+    stopSound();
+    setLED1(18, 73, 237);
 
     // ================= ATUALIZA CONFIG =================
     if (strlen(custom_host.getValue()) > 0)
@@ -110,8 +147,10 @@ void wifiTask(void *pvParameters) {
     if (strlen(custom_port.getValue()) > 0)
         strcpy(ws_port, custom_port.getValue());
 
+#if !USE_DEFAULT_DEVICE_ID
     if (strlen(custom_device.getValue()) > 0)
         strcpy(device_id, custom_device.getValue());
+#endif
 
     // ================= SALVA CONFIG =================
     preferences.begin("config", false);
@@ -122,6 +161,7 @@ void wifiTask(void *pvParameters) {
 
     preferences.end();
 
+    // ================= DEBUG =================
     Serial.println("[WiFi] Configuração:");
     Serial.println(ws_host);
     Serial.println(ws_port);
@@ -136,7 +176,7 @@ void wifiTask(void *pvParameters) {
     Serial.print("DNS: ");
     Serial.println(WiFi.dnsIP());
 
-    // ================= ESPERA ESTABILIZAÇÃO =================
+    // ================= ESTABILIZAÇÃO =================
     Serial.println("[WiFi] Aguardando estabilização da rede...");
     delay(3000);
 
@@ -164,7 +204,6 @@ void wifiTask(void *pvParameters) {
 
     Serial.println("[WiFi] Finalizado com sucesso");
 
-    // 🔥 libera outras tasks
     wifiReady = true;
 
     vTaskDelete(NULL);

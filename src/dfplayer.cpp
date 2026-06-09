@@ -62,7 +62,6 @@ void setVolume(int volume) {
 
     if (!df_ok) return;
 
-    // 🔥 DFPlayer aceita 0 - 30
     if (volume < 0) volume = 0;
     if (volume > 50) volume = 50;
 

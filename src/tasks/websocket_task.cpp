@@ -1,11 +1,15 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include "websocket_task.h"
 #include "../websocket.h"
 #include "../system_state.h"
 #include "../hardware.h"
 #include "../dfplayer.h"
+
+extern TaskHandle_t mpuTaskHandle;
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -206,9 +210,12 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                     // ================= WIN EFFECT =================
                     if (command == "WIN_EFFECT") {
 
+                        if (mpuTaskHandle != NULL) {
+                            vTaskSuspend(mpuTaskHandle);
+                        }
                         Serial.println("[CMD] WIN_EFFECT");
                         setLED1(0, 255, 0); 
-                        playSound(random(4, 8)); // som 4 a 7
+                        playSound(random(5, 9)); // som 5 a 8
 
                         setSmoke(true);
                         delay(2000);
@@ -220,6 +227,10 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
                         
                         delay(5000);
                         setSmoke(false);
+                        
+                        if (mpuTaskHandle != NULL) {
+                            vTaskResume(mpuTaskHandle);
+                        }
                     }
 
                     // ================= ERROR EFFECT =================
@@ -227,7 +238,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
                         Serial.println("[CMD] ERROR_EFFECT");
 
-                        playSound(2);
+                        playSound(10);
                         int prevR = strip1R;
                         int prevG = strip1G;
                         int prevB = strip1B;
