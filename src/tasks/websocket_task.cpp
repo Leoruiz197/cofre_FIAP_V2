@@ -295,6 +295,7 @@ void websocketTask(void *pvParameters) {
 
         // ================= CONECTA =================
         webSocket.beginSSL(ws_host, atoi(ws_port), "/");
+        //webSocket.begin(ws_host, atoi(ws_port), "/");
         webSocket.onEvent(webSocketEvent);
         webSocket.setReconnectInterval(5000);
 

@@ -40,7 +40,7 @@ void playSound(int track) {
     currentTrack = track;
     soundPlaying = true;
 
-    dfPlayer.play(track);
+    dfPlayer.play(track == 10 ? 1 : track + 1);
 
     Serial.println("[DF] Tocando faixa");
 }
