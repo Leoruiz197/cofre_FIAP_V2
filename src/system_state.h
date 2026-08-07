@@ -12,6 +12,7 @@ extern bool wsConnected;
 
 extern int servoAngle;
 extern bool smokeActive;
+extern bool motionSensorEnabled;
 
 extern bool soundPlaying;
 extern int currentTrack;

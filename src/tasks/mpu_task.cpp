@@ -4,6 +4,7 @@
 #include "../hardware.h"
 #include "../config.h"
 #include "../dfplayer.h"
+#include "../system_state.h"
 
 float threshold = 1.2;
 
@@ -62,6 +63,11 @@ void mpuTask(void *pvParameters) {
     unsigned long lastTrigger = 0;
 
     while (true) {
+        if (!motionSensorEnabled) {
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+            continue;
+        }
+
         float ax = 0;
         float ay = 0;
         float az = 0;

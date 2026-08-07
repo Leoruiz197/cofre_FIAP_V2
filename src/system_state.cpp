@@ -7,6 +7,7 @@ int servoAngle = 0;
 bool doorOpen = false;
 bool internalLightOn = false;
 bool smokeActive = false;
+bool motionSensorEnabled = true;
 
 bool soundPlaying = false;
 int currentTrack = 0;

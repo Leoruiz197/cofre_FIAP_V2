@@ -28,6 +28,7 @@ void statusTask(void *pvParameters) {
         doc["openAngle"] = doorOpenAngle;
         doc["closeAngle"] = doorCloseAngle;
         doc["smoke"] = smokeActive;
+        doc["motionSensor"] = motionSensorEnabled;
 
         JsonObject sound = doc["sound"].to<JsonObject>();
         sound["playing"] = soundPlaying;
