@@ -16,8 +16,16 @@ unsigned long lastWsReconnectAttempt = 0;
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length);
 
 void connectWebSocket() {
-    //webSocket.beginSSL(ws_host, atoi(ws_port), "/");
-    webSocket.begin(ws_host, atoi(ws_port), "/");
+    int port = atoi(ws_port);
+
+    if (port == 443) {
+        Serial.println("[WS] Conectando com SSL");
+        webSocket.beginSSL(ws_host, port, "/");
+    } else {
+        Serial.println("[WS] Conectando sem SSL");
+        webSocket.begin(ws_host, port, "/");
+    }
+
     webSocket.onEvent(webSocketEvent);
     webSocket.setReconnectInterval(5000);
     webSocket.enableHeartbeat(15000, 3000, 2);
