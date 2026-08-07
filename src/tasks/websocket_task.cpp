@@ -11,6 +11,18 @@
 
 extern TaskHandle_t mpuTaskHandle;
 
+unsigned long lastWsReconnectAttempt = 0;
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length);
+
+void connectWebSocket() {
+    //webSocket.beginSSL(ws_host, atoi(ws_port), "/");
+    webSocket.begin(ws_host, atoi(ws_port), "/");
+    webSocket.onEvent(webSocketEvent);
+    webSocket.setReconnectInterval(5000);
+    webSocket.enableHeartbeat(15000, 3000, 2);
+}
+
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
     switch(type) {
@@ -18,6 +30,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         case WStype_CONNECTED:
             Serial.println("[WS] Conectado");
             wsConnected = true;
+            lastWsReconnectAttempt = millis();
 
             // 🔥 envia identificação do device
             {
@@ -35,6 +48,13 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         case WStype_DISCONNECTED:
             Serial.println("[WS] Desconectado");
             wsConnected = false;
+            lastWsReconnectAttempt = millis();
+            break;
+
+        case WStype_ERROR:
+            Serial.println("[WS] Erro na conexão");
+            wsConnected = false;
+            lastWsReconnectAttempt = millis();
             break;
 
         case WStype_TEXT:
@@ -294,14 +314,20 @@ void websocketTask(void *pvParameters) {
         Serial.println("[WS] DNS OK, conectando...");
 
         // ================= CONECTA =================
-        webSocket.beginSSL(ws_host, atoi(ws_port), "/");
-        //webSocket.begin(ws_host, atoi(ws_port), "/");
-        webSocket.onEvent(webSocketEvent);
-        webSocket.setReconnectInterval(5000);
+        connectWebSocket();
+        lastWsReconnectAttempt = millis();
 
         // ================= LOOP =================
         while (WiFi.status() == WL_CONNECTED) {
             webSocket.loop();
+
+            if (!wsConnected && millis() - lastWsReconnectAttempt > 5000) {
+                Serial.println("[WS] Forçando reconexão WebSocket...");
+                lastWsReconnectAttempt = millis();
+                webSocket.disconnect();
+                connectWebSocket();
+            }
+
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
 
